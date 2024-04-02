@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "help-kiosk"
+version = "0.1.0"
+description = "scrapping data from college website and tokenisation"
+authors = ["Siddhesh Agarwal <siddhesh.agarwal@gmail.com>"]
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.10"
+requests = "^2.31.0"
+bs4 = "^0.0.2"
+langchain = "^0.1.7"
+langchain-core = "^0.1.23"
+langchain-openai = "^0.0.6"
+python-dotenv = "^1.0.1"
+langchain-community = "^0.0.21"
+chromadb = "<0.4.16"
+
+
+[tool.poetry.group.st-app.dependencies]
+streamlit = "^1.31.1"
+
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
