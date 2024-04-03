@@ -69,7 +69,7 @@ rag_chain = {  # type: ignore
 def add_message(
     message: str | Iterator[str],
     *,
-    sender: Literal["user", "assistant", "ai", "human"],
+    sender: Literal["user", "ai"],
     add_to_history: bool = True,
 ):
     """Add a message to the chat history."""
@@ -78,9 +78,9 @@ def add_message(
         st.write_stream(message)
     if add_to_history:
         match sender:
-            case "user" | "human":
+            case "user":
                 history.add_user_message(str(message))
-            case "assistant" | "ai":
+            case "ai":
                 history.add_ai_message(str(message))
 
 
