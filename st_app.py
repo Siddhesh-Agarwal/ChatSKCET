@@ -1,18 +1,19 @@
-from datetime import datetime
-import os
+#!/usr/bin/env python
 from typing import Iterator, Literal
 
 import streamlit as st
 from dotenv import load_dotenv
+from langchain.embeddings.ollama import OllamaEmbeddings
 from langchain.hub import pull
+from langchain.llms.ollama import Ollama
+from langchain.vectorstores.chroma import Chroma
 from langchain_community.chat_message_histories.streamlit import (
     StreamlitChatMessageHistory,
 )
-from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.documents.base import Document
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+# from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 load_dotenv()
 
@@ -21,11 +22,12 @@ load_dotenv()
 def get_retriever():
     """Get the Chroma DB."""
 
-    embedding = OpenAIEmbeddings(
-        model="text-embedding-3-large",
-        dimensions=1024,
-        skip_empty=True,
-    )
+    # embedding = OpenAIEmbeddings(
+    #     model="text-embedding-3-large",
+    #     dimensions=1024,
+    #     skip_empty=True,
+    # )
+    embedding = OllamaEmbeddings(model="llama3")
     return Chroma(
         collection_name="skcet",
         persist_directory="./chroma",
@@ -36,26 +38,19 @@ def get_retriever():
     )
 
 
-def log_docs(string: str):
-    """Log the docs."""
-
-    file = f"./logs/{datetime.now().isoformat()}.txt"
-    os.makedirs("./logs/", exist_ok=True)
-    with open(file, mode="w+", encoding="utf-8") as f:
-        f.write(string)
-
-
-def format_docs(docs: list[Document]):
+def format_docs(docs: list[Document], verbose: bool = False):
     """Format the docs as a strings."""
 
     res = "\n\n".join(doc.page_content for doc in docs)
-    log_docs(res)
+    if verbose:
+        print(res)
     return res
 
 
 history = StreamlitChatMessageHistory()
 retriever = get_retriever()
-llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0125")
+# llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0125")
+llm = Ollama(model="llama3")
 prompt = pull("rlm/rag-prompt")
 rag_chain = {  # type: ignore
     "context": retriever | format_docs,
