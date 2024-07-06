@@ -4,7 +4,6 @@ version = "0.1.0"
 description = "scrapping data from college website and tokenisation"
 authors = ["Siddhesh Agarwal <siddhesh.agarwal@gmail.com>"]
 readme = "README.md"
-package-mode = false
 license = "MIT"
 
 
