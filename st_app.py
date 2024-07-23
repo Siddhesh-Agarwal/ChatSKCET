@@ -3,20 +3,21 @@ from typing import Iterator, Literal
 
 import streamlit as st
 from dotenv import load_dotenv
-from langchain.embeddings.ollama import OllamaEmbeddings
+from langchain_community.embeddings.ollama import OllamaEmbeddings
 from langchain.hub import pull
-from langchain.llms.ollama import Ollama
-from langchain.vectorstores.chroma import Chroma
 from langchain_community.chat_message_histories.streamlit import (
     StreamlitChatMessageHistory,
 )
+from langchain_community.llms.ollama import Ollama
+from langchain_community.vectorstores.chroma import Chroma
 from langchain_core.documents.base import Document
 from langchain_core.output_parsers.string import StrOutputParser
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain.globals import set_verbose
 # from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 load_dotenv()
-
+set_verbose(True)
 
 @st.cache_resource
 def get_retriever():
@@ -61,32 +62,28 @@ rag_chain = {  # type: ignore
 } | StrOutputParser()
 
 
-def add_message(
-    message: str | Iterator[str],
-    *,
-    sender: Literal["user", "ai"],
-    add_to_history: bool = True,
-):
-    """Add a message to the chat history."""
-
-    with st.chat_message(sender, avatar=sender):
-        st.write_stream(message)
+def add_ai_message(message: Iterator[str], add_to_history: bool = False):
+    st.chat_message("ai", avatar="ai").write_stream(message)
     if add_to_history:
-        match sender:
-            case "user":
-                history.add_user_message(str(message))
-            case "ai":
-                history.add_ai_message(str(message))
+        history.add_ai_message(str(message))
 
+def add_user_message(message: str, add_to_history: bool = False):
+    st.chat_message("user", avatar="user").write(message)
+    if add_to_history:
+        history.add_user_message(str(message))
+
+def stream(text: str):
+    for char in text:
+        yield char
 
 if len(history.messages) == 0:
-    add_message("Hi! Ask me a question about SKCET.", sender="ai")
+    add_ai_message(stream("Hi! Ask me a question about SKCET."))
 
 for msg in history.messages:
     add_message(msg.content, sender=msg.type, add_to_history=False)  # type: ignore
 
 if query := st.chat_input("Ask a question about SKCET:"):
     if query:
-        add_message(query, sender="user")
+        add_user_message(query)
         result: Iterator[str] = rag_chain.stream(query)  # type: ignore
-        add_message(result, sender="ai")
+        add_ai_message(result)
