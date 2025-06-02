@@ -1,5 +1,6 @@
 "use server";
 
+import parse from "node-html-parser";
 import type { SearchResult, Response } from "./types";
 import { OpenAI } from "openai";
 
@@ -18,7 +19,7 @@ async function getSearchResults(query: string, client: OpenAI): Promise<SearchRe
                 {
                     type: "function",
                     function: {
-                        name: "web_search",
+                        name: "skcet_web_search",
                         description: "Search the SKCET Website for information.",
                         parameters: {
                             type: "object",
@@ -40,7 +41,7 @@ async function getSearchResults(query: string, client: OpenAI): Promise<SearchRe
             throw new Error("No tool calls found");
         }
         const searchQuery = toolCalls[0];
-        if (searchQuery.function.name !== "search") {
+        if (searchQuery.function.name !== "skcet_web_search") {
             throw new Error("Invalid tool call");
         }
         return await getSearchResultsFromQuery(searchQuery.function.arguments);
@@ -50,7 +51,7 @@ async function getSearchResults(query: string, client: OpenAI): Promise<SearchRe
 }
 
 async function getSearchResultsFromQuery(query: string): Promise<SearchResult[]> {
-    console.log(query);
+    query = JSON.parse(query).query;
 
     // Construct DuckDuckGo search URL with site restriction
     const searchQuery = `${query} site:skcet.ac.in`;
@@ -79,8 +80,7 @@ async function getSearchResultsFromQuery(query: string): Promise<SearchResult[]>
 
 function parseSearchResults(html: string): SearchResult[] {
     // Create a DOM parser (works in browser, you'll need jsdom for Node.js)
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
+    const doc = parse(html);
 
 
     // DuckDuckGo's result containers
@@ -106,8 +106,6 @@ function parseSearchResults(html: string): SearchResult[] {
             }
         }
     });
-
-    console.log(results);
 
     return results;
 }
