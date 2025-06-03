@@ -34,7 +34,8 @@ async function getSearchResults(query: string, client: OpenAI): Promise<SearchRe
                     }
                 }
             ],
-            tool_choice: "auto"
+            tool_choice: "auto",
+            temperature: 0,
         })
         const toolCalls = response.choices[0]?.message?.tool_calls;
         if (!toolCalls || toolCalls.length == 0) {
@@ -70,7 +71,7 @@ async function getSearchResultsFromQuery(query: string): Promise<SearchResult[]>
         }
 
         const html = await response.text();
-        return parseSearchResults(html);
+        return parseSearchResults(html, 5);
 
     } catch (error) {
         console.error('Search failed:', error);
@@ -78,10 +79,9 @@ async function getSearchResultsFromQuery(query: string): Promise<SearchResult[]>
     }
 }
 
-function parseSearchResults(html: string): SearchResult[] {
+function parseSearchResults(html: string, n: number): SearchResult[] {
     // Create a DOM parser (works in browser, you'll need jsdom for Node.js)
     const doc = parse(html);
-
 
     // DuckDuckGo's result containers
     const resultElements = doc.querySelectorAll('.result__body');
@@ -100,14 +100,14 @@ function parseSearchResults(html: string): SearchResult[] {
             if (url && title && snippet && url.includes('skcet.ac.in')) {
                 results.push({
                     url: url.startsWith('http') ? url : `https://${url}`,
-                    title,
-                    snippet
+                    title: title,
+                    snippet: snippet,
                 });
             }
         }
     });
 
-    return results;
+    return results.slice(0, n);
 }
 
 export default async function generateResponse(query: string): Promise<Response> {
