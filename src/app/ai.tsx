@@ -132,7 +132,8 @@ export default async function generateResponse(query: string): Promise<Response>
                 "role": "user",
                 "content": query
             }
-        ]
+        ],
+        temperature: 0.2,
     })
 
     const content = response.choices[0].message.content;
