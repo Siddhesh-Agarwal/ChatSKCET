@@ -73,8 +73,7 @@ async function getSearchResultsFromQuery(query: string): Promise<SearchResult[]>
         const html = await response.text();
         return parseSearchResults(html, 5);
 
-    } catch (error) {
-        console.error('Search failed:', error);
+    } catch {
         return [];
     }
 }
@@ -110,9 +109,13 @@ function parseSearchResults(html: string, n: number): SearchResult[] {
     return results.slice(0, n);
 }
 
-export default async function generateResponse(query: string): Promise<Response> {
+export async function getApiKey(): Promise<string> {
+    return process.env.GROQ_API_KEY || "";
+}
+
+export async function generateResponse(query: string, apiKey: string): Promise<Response> {
     const client = new OpenAI({
-        apiKey: process.env.GROQ_API_KEY,
+        apiKey: apiKey,
         baseURL: "https://api.groq.com/openai/v1"
     });
 
