@@ -20,14 +20,14 @@ function Reference({ url, title, snippet }: SearchResult) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex px-1 py-0.5 max-w-xs w-full border rounded-md gap-1 hover:bg-gray-200 transition-colors"
+      className="flex items-start px-2 py-1.5 max-w-xs w-full border rounded-md gap-2 hover:bg-gray-200 transition-colors"
     >
-      <Link size={30} className="border bg-gray-100 p-1 rounded" />
-      <div className="flex flex-col">
+      <Link size={16} className="border bg-gray-100 p-1 rounded flex-shrink-0 mt-0.5" />
+      <div className="flex flex-col min-w-0">
         <h2 className="text-sm font-semibold line-clamp-1 overflow-ellipsis">
           {title}
         </h2>
-        <h3 className="text-xs line-clamp-1 overflow-ellipsis">{snippet}</h3>
+        <h3 className="text-xs line-clamp-1 overflow-ellipsis text-gray-600">{snippet}</h3>
       </div>
     </a>
   );
@@ -41,20 +41,20 @@ function BotMessage({
   references?: SearchResult[];
 }) {
   return (
-    <div className="flex flex-col justify-start">
+    <div className="flex flex-col">
       <div className="flex gap-2">
         <Bot
-          className="mt-1 flex-shrink-0 border rounded-full bg-blue-100"
-          size={24}
+          className="mt-1 flex-shrink-0 border rounded-full bg-blue-100 p-1"
+          size={20}
         />
-        <div className="flex max-w-[85%] px-4 py-2 rounded-2xl bg-muted rounded-tl-none items-start gap-3 border">
+        <div className="flex max-w-[85%] px-4 py-2 rounded-2xl bg-muted rounded-tl-none">
           <div className="text-sm leading-relaxed whitespace-pre-line">
             {message}
           </div>
         </div>
       </div>
       {references && references.length > 0 && (
-        <div className="flex overflow-x-scroll mt-1.5 gap-2">
+        <div className="flex overflow-x-scroll mt-2 gap-2 ml-8">
           {references.map((reference) => (
             <Reference
               key={hash("sha256", JSON.stringify(reference))}
