@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Send, Bot, User, University, Link, Settings } from "lucide-react";
+import { Send, Bot, User, University, Link, KeyRound } from "lucide-react";
 import { generateResponse, getApiKey } from "./ai";
 import type { Message, SearchResult } from "./types";
 import { hash } from "crypto";
@@ -153,7 +153,7 @@ export default function Home() {
                     size={"icon"}
                     className="hover:cursor-pointer hover:bg-blue-100"
                   >
-                    <Settings className="h-6 w-6" />
+                    <KeyRound className="h-6 w-6" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
